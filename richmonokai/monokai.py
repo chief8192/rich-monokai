@@ -24,8 +24,6 @@
 # SOFTWARE.
 
 
-import argparse
-import time
 import types
 
 from rich.color import Color
