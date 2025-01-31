@@ -343,8 +343,8 @@ class DataProgress(SimpleProgress):
 class MonokaiConsole(DefaultConsole):
 
     def __init__(self, *args, **kwargs):
-        new_kwargs = {"theme": MonokaiTheme()}
-        super().__init__(*args, **new_kwargs)
+        kwargs["theme"] = MonokaiTheme()
+        super().__init__(*args, **kwargs)
 
     def PrintWithLabel(
         self, label: str, message: str, label_fg: Style = FOREGROUND.WHITE
