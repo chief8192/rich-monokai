@@ -23,15 +23,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from __future__ import annotations
 
 import types
 
+from contextlib import contextmanager
 from rich.color import Color
 from rich.console import Console as DefaultConsole
-from rich.progress import Progress
+from rich.progress import (
+    BarColumn,
+    DownloadColumn,
+    MofNCompleteColumn,
+    Progress,
+    ProgressColumn,
+    TaskID,
+    TextColumn,
+)
 from rich.style import Style
 from rich.text import Text
 from rich.theme import Theme
+from typing import Tuple, Type, Iterator, List
 
 
 COLOR = types.SimpleNamespace(
@@ -119,7 +130,7 @@ class MonokaiTheme(Theme):
     def __init__(self):
         super().__init__(
             styles={
-                "bar.back": FOREGROUND.LIGHT_GRAY,
+                "bar.back": FOREGROUND.DARK_GRAY,
                 "bar.complete": FOREGROUND.GREEN,
                 "bar.finished": FOREGROUND.GREEN,
                 "bar.pulse": FOREGROUND.ORANGE,
@@ -204,7 +215,7 @@ class MonokaiTheme(Theme):
                 "pretty": "none",
                 "progress.data.speed": FOREGROUND.RED,
                 "progress.description": FOREGROUND.WHITE,
-                "progress.download": FOREGROUND.GREEN,
+                "progress.download": FOREGROUND.WHITE,
                 "progress.elapsed": FOREGROUND.YELLOW,
                 "progress.filesize.total": FOREGROUND.GREEN,
                 "progress.filesize": FOREGROUND.GREEN,
@@ -289,28 +300,82 @@ class MonokaiTheme(Theme):
         )
 
 
+class SimpleProgress(Progress):
+    """Simplified, single-task Progress bar."""
+
+    def __init__(
+        self,
+        console: Type[MonokaiConsole],
+        remaining_column: ProgressColumn,
+        bar_width: int = 40,
+        refresh_per_second: int = 1,
+    ):
+        super().__init__(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(bar_width=bar_width),
+            remaining_column,
+            console=console,
+            refresh_per_second=refresh_per_second,
+        )
+        self.task_id = None
+
+    def AddTask(self, description: str, total: int):
+        if self.task_id is None:
+            self.task_id = self.add_task(description, start=True, total=total)
+
+    def Advance(self, advance=1):
+        if self.task_id is not None:
+            self.advance(self.task_id, advance=advance)
+
+
+class NumericProgress(SimpleProgress):
+
+    def __init__(self, console: Type[MonokaiConsole], **kwargs):
+        super().__init__(console, MofNCompleteColumn(), **kwargs)
+
+
+class DataProgress(SimpleProgress):
+
+    def __init__(self, console: Type[MonokaiConsole], **kwargs):
+        super().__init__(console, DownloadColumn(), **kwargs)
+
+
 class MonokaiConsole(DefaultConsole):
 
     def __init__(self, *args, **kwargs):
         new_kwargs = {"theme": MonokaiTheme()}
         super().__init__(*args, **new_kwargs)
 
-    def PrintWithLabel(self, label, message, label_fg=FOREGROUND.WHITE):
+    def PrintWithLabel(
+        self, label: str, message: str, label_fg: Style = FOREGROUND.WHITE
+    ):
         self.print(f"{label}:", style=label_fg + ATTRIBUTE.BOLD, end=" ")
         self.print(f"{message}", style=FOREGROUND.WHITE + ATTRIBUTE.NOT_BOLD, end="\n")
 
-    def PrintException(self, ex):
+    def PrintException(self, ex: Exception):
         self.PrintFailure(ex.__class__.__name__, str(ex))
 
-    def PrintFailure(self, label, message):
+    def PrintFailure(self, label: str, message: str):
         self.PrintWithLabel(label, message, label_fg=FOREGROUND.RED)
 
-    def PrintStatus(self, label, message):
+    def PrintStatus(self, label: str, message: str):
         self.PrintWithLabel(label, message, label_fg=FOREGROUND.BLUE)
 
-    def PrintSuccess(self, label, message):
+    def PrintSuccess(self, label: str, message: str):
         self.PrintWithLabel(label, message, label_fg=FOREGROUND.GREEN)
 
-    def Status(self, message):
+    def Status(self, message: str):
         style = FOREGROUND.ORANGE + ATTRIBUTE.BOLD
         return self.status(Text(message, style=style), spinner_style=style)
+
+    @contextmanager
+    def NumericProgressBar(self, description: str, total: int) -> Iterator[None]:
+        with NumericProgress(self) as progress:
+            progress.AddTask(description, total)
+            yield progress
+
+    @contextmanager
+    def DataProgressBar(self, description: str, total: int) -> Iterator[None]:
+        with DataProgress(self) as progress:
+            progress.AddTask(description, total)
+            yield progress
