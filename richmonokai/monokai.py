@@ -328,6 +328,10 @@ class SimpleProgress(Progress):
         if self.task_id is not None:
             self.advance(self.task_id, advance=advance)
 
+    def Reset(self):
+        if self.task_id is not None:
+            self.reset(self.task_id)
+
 
 class NumericProgress(SimpleProgress):
 
