@@ -38,11 +38,12 @@ from rich.progress import (
     ProgressColumn,
     TaskID,
     TextColumn,
+    track,
 )
 from rich.style import Style
 from rich.text import Text
 from rich.theme import Theme
-from typing import Tuple, Type, Iterator, List
+from typing import Tuple, Type, Iterator, List, Iterable
 
 
 COLOR = types.SimpleNamespace(
@@ -131,7 +132,7 @@ class MonokaiTheme(Theme):
         super().__init__(
             styles={
                 "bar.back": FOREGROUND.DARK_GRAY,
-                "bar.complete": FOREGROUND.GREEN,
+                "bar.complete": FOREGROUND.WHITE,
                 "bar.finished": FOREGROUND.GREEN,
                 "bar.pulse": FOREGROUND.ORANGE,
                 "black": FOREGROUND.BLACK,
@@ -213,13 +214,13 @@ class MonokaiTheme(Theme):
                 "markdown.text": "none",
                 "none": "none",
                 "pretty": "none",
-                "progress.data.speed": FOREGROUND.RED,
+                "progress.data.speed": FOREGROUND.WHITE,
                 "progress.description": FOREGROUND.WHITE,
                 "progress.download": FOREGROUND.WHITE,
-                "progress.elapsed": FOREGROUND.YELLOW,
+                "progress.elapsed": FOREGROUND.BLUE,
                 "progress.filesize.total": FOREGROUND.GREEN,
                 "progress.filesize": FOREGROUND.GREEN,
-                "progress.percentage": FOREGROUND.RED,
+                "progress.percentage": FOREGROUND.WHITE,
                 "progress.remaining": FOREGROUND.BLUE,
                 "progress.spinner": FOREGROUND.GREEN,
                 "prompt.choices": FOREGROUND.RED + ATTRIBUTE.BOLD,
@@ -379,3 +380,9 @@ class MonokaiConsole(DefaultConsole):
         with DataProgress(self) as progress:
             progress.AddTask(description, total)
             yield progress
+
+    def Track(self, sequence: Iterable[object], description: str) -> object:
+        for item in track(
+            sequence, description=description, console=self, show_speed=False
+        ):
+            yield item
