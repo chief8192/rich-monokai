@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rich_monokai"
-version = "1.2.1"
+version = "1.2.2"
 authors = [
     {name = "Matt Doyle"},
 ]
@@ -14,7 +14,7 @@ requires-python = ">=3.0"
 keywords = ["rich", "monokai"]
 license = {text = "MIT"}
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
 ]

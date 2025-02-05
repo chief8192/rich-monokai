@@ -347,7 +347,7 @@ class DataProgress(SimpleProgress):
 
 class MonokaiConsole(DefaultConsole):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, highlight: bool = False, *args, **kwargs):
         kwargs["theme"] = MonokaiTheme()
         super().__init__(*args, **kwargs)
 
