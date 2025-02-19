@@ -27,7 +27,7 @@ from setuptools import setup
 
 setup(
     name="rich_monokai",
-    version="1.2.2",
+    version="1.2.3",
     description="A Monokai theme for the Textualize/rich Python package.",
     url="https://github.com/chief8192/rich-monokai",
     author="Matt Doyle",

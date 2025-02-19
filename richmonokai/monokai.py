@@ -223,7 +223,7 @@ class MonokaiTheme(Theme):
                 "progress.percentage": FOREGROUND.WHITE,
                 "progress.remaining": FOREGROUND.BLUE,
                 "progress.spinner": FOREGROUND.GREEN,
-                "prompt.choices": FOREGROUND.RED + ATTRIBUTE.BOLD,
+                "prompt.choices": FOREGROUND.YELLOW + ATTRIBUTE.BOLD,
                 "prompt.default": FOREGROUND.BLUE + ATTRIBUTE.BOLD,
                 "prompt.invalid.choice": FOREGROUND.RED,
                 "prompt.invalid": FOREGROUND.RED,
