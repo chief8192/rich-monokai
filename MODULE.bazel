@@ -1,6 +1,6 @@
 """Bazel module"""
 
-module(name = "python_tools")
+module(name = "rich_monokai")
 
 # Use version found here:
 # https://github.com/bazelbuild/rules_python/releases
